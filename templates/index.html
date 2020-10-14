@@ -8,6 +8,24 @@
             .hidden {
                 display: none;
             }
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                width: 200px;
+            }
+            li {
+                clear: both;
+            }
+            li button {
+                -webkit-appearance: none;
+                border: none;
+                outline: none;
+                color: red;
+                float: right;
+                cursor: pointer;
+                font-size: 20px;
+            }
         </style>
     </head>
     <body>
@@ -22,11 +40,40 @@
 
         <ul id="todos">
             {% for d in data %}
-                <li><input class="check-completed" data-id="{{ d.id }}" type="checkbox" {% if d.completed %} checked {% endif %} />{{ d.description }}</li>
+                <li><input class="check-completed" data-id="{{ d.id }}" type="checkbox" {% if d.completed %} checked {% endif %} />
+                    {{ d.description }}
+                    <button class="delete-btn" data-id="{{ d.id }}" >&cross;</button>
+                </li>
             {% endfor %}
         </ul>
 
         <script>
+            const deleteBtns = document.querySelectorAll('.delete-btn');
+
+            for (let i = 0; i < deleteBtns.length; i++) {
+
+                const deleteBtn = deleteBtns[i];
+
+                deleteBtn.onclick = function(e) {
+
+                    console.log('event', e);
+
+                    const todoId = e.target.dataset['id'];
+
+                    fetch('/todos/' + todoId, {
+                        method: 'DELETE'
+                    })
+                    .then(function() {
+                        e.target.parentNode.remove();
+                        document.getElementById('error').className = 'hidden';
+                    })
+                    .catch(function(error) {
+                        // console.log(error);
+                        document.getElementById('error').className = '';
+                    });
+                }
+            }
+
             const checkboxes = document.querySelectorAll('.check-completed');
 
             for (let i = 0; i < checkboxes.length; i++) {
